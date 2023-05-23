@@ -19,22 +19,29 @@ func Output() {
 		if len(args[0]) <= 8 { //argument malformaté
 			fmt.Println("Usage: go run . [OPTION] [STRING] [BANNER]\n\nEX: go run . --output=<fileName.txt> something standard")
 		} else {
-			file, _ := os.Create(args[0][9:])
-			_, err := file.WriteString(Naboutput(args[2], args[1]))
-			if err != nil {
-				fmt.Println(err)
+			if len(args[0]) > 9 {
+				file, _ := os.Create(args[0][9:])
+				_, err := file.WriteString(Naboutput(args[2], args[1]))
+				if err != nil {
+					fmt.Println(err)
+				}
+			} else {
+				fmt.Println("Le fichier a creer n'est pas commmmunique\n\nEX: go run . --output=<fileName.txt> something standard")
 			}
-
 		}
 
 		//cas fs
 	} else if len(args) == 2 {
 		//flag sans banner on applique le banner standard
 		if len(args[0]) >= 9 && args[0][:9] == "--output=" {
-			file, _ := os.Create(args[0][9:])
-			_, err := file.WriteString(Naboutput("standard", args[1]))
-			if err != nil {
-				fmt.Println(err)
+			if len(args[0]) > 9 {
+				file, _ := os.Create(args[0][9:])
+				_, err := file.WriteString(Naboutput("standard", args[1]))
+				if err != nil {
+					fmt.Println(err)
+				}
+			} else {
+				fmt.Println("Le fichier a creer n'est pas commmmunique\n\nEX: go run . --output=<fileName.txt> something standard")
 			}
 		}
 		//cas de ascii art

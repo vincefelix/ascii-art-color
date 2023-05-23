@@ -12,7 +12,9 @@ import (
 
 func main() {
 	args := os.Args[1:] //Récuperation des arguments et stockage dans une variable
-	if len(args) > 3 {
+	if len(args)==0 {
+		fmt.Println("Usage: go run . [OPTION] [STRING] [BANNER]\n\nEX: go run . --color=<color> <letters to be colored> 'something'")
+	} else if len(args) > 3 {
 		if len(args[0]) >= 7 && args[0][:7] == "--color" { // Cas color avec un excédent d'arguments
 
 			FuncCol.Color()

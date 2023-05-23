@@ -54,7 +54,7 @@ func Color() {
 		if len(args[0]) >= 7 && args[0][:7] == "--color" {
 			if len(args[0]) > 7 && args[0][7] == '=' { //argument malformaté
 				fmt.Println("Usage: go run . [OPTION] [STRING] [BANNER]\n\nEX: go run . --color=<color> <letters to be colored> 'something'")
-			} else if len(args[0]) == 7 && args[0][:7] == "color" {
+			} else if len(args[0]) == 7 && args[0][:7] == "--color" {
 				fmt.Println("Usage: go run . [OPTION] [STRING] [BANNER]\n\nEX: go run . --color=<color> <letters to be colored> 'something'")
 			} else {
 				Func.Naboufs("standard", args[0])
