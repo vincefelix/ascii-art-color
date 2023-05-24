@@ -20,9 +20,23 @@ var yellow = Colors{"yellow", "\033[33m"}
 var blue = Colors{"blue", "\033[34m"}
 var violet = Colors{"violet", "\033[35m"}
 var cyan = Colors{"cyan", "\033[36m"}
-var grey = Colors{"grey", "\033[37m"}
+var white = Colors{"white", "\033[<37m"}
 var orange = Colors{"orange", "\033[38;2;255;165;0m"}
-var tabcolors = []Colors{black, red, green, yellow, blue, violet, cyan, grey, orange}
+var pink = Colors{"pink", "\033[38;5;206m"}
+var brown = Colors{"brown", "\033[38;5;130m"}
+var purple = Colors{"purple", "\033[38;5;141m"}
+var magenta = Colors{"magenta", "\033[38;5;205m"}
+var grey = Colors{"grey", "\033[90m"}
+var bright_red = Colors{"bright red", "\033[91m"}
+var bright_green = Colors{"bright green", "\033[92m"}
+var bright_yellow = Colors{"bright yellow", "\033[93m"}
+var bright_blue = Colors{"bright_blue", "\033[94m"}
+var bright_magenta = Colors{"bright magenta", "\033[95m"}
+var bright_cyan = Colors{"bright cyan", "\033[96m"}
+var bright_white = Colors{"bright white", "\033[97m"}
+var tabcolors = []Colors{black, red, green, yellow, blue, violet, white,
+	cyan, grey, orange, pink, brown, purple, magenta, bright_red,
+	bright_green, bright_yellow, bright_blue, bright_magenta, bright_cyan, bright_white}
 var regexHSL = regexp.MustCompile(`^hsl+\([0-9]+\, +[0-9]+\%, +[0-9]+\%+\)$`)
 var regexRGB = regexp.MustCompile(`^rgb+\([0-9]+\, +[0-9]+\, +[0-9]+\)$`)
 var regexHEXA = regexp.MustCompile(`[0-9a-fA-F]{6}`)

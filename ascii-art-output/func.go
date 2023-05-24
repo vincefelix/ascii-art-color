@@ -187,5 +187,5 @@ func Naboutput(banner, phrase string) string {
 			}
 		}
 	}
-	return final
+	return final + "\n"
 }

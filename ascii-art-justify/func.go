@@ -238,7 +238,7 @@ func Naboujust(banner string, phrase string, a string) []string {
 			tabtranche = append(tabtranche, tranche)
 		}
 	} else {
-		fmt.Print("ATTENTION, le texte est trop grand\nreessayez avec un plus petit nombre de caractere svp")
+		fmt.Println("ATTENTION, le texte est trop grand\nreessayez avec un plus petit nombre de caractere svp")
 		// Message d'erreur au cas ou la représentation graphique est trop grande pour le terminal
 	}
 

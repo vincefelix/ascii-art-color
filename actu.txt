@@ -1,5 +1,0 @@
-évolution de ascii-art-color (23/05)
-
-à rajouter:
-*fonctions pour colorier (capitaine)
-*fichier test (capitaine)

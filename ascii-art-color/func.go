@@ -114,7 +114,7 @@ func ColoredAscii(colorType, letters, phrase, banner string) {
 			}
 		}
 	} else {
-		fmt.Println("unknow color")
+		fmt.Printf("'%v' n'est pas pris en compte\n", colorType)
 	}
 }
 
