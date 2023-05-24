@@ -1,7 +1,7 @@
 package Func
 
 import (
-	Func "Func/ascii-art-fs"
+	funca "Func/ascii-art"
 	"bufio"
 	"fmt"
 	"os"
@@ -9,61 +9,113 @@ import (
 )
 
 func Color() {
-	//--Stocker les arguments dans une variable
 	args := os.Args[1:]
 
-	//------------------------------------------------  I  ----------------------------------------------------------------//
-	if len(args) > 3 { // cas où les arguments excèdent la norme
-		fmt.Println("Usage: go run . [OPTION] [STRING] [BANNER]\n\nEX: go run . --color=<color> <letters to be colored> 'something'")
-	}
-
-	//------------------------------------------------  II  ---------------------------------------------------------------//
-	if len(args) == 3 { // cas où les arguments respectent la norme
-		if len(args[0]) < 8 { //flag malformaté
-			fmt.Println("Usage: go run . [OPTION] [STRING] [BANNER]\n\nEX: go run . --color=<color> <letters to be colored> 'something'")
-		} else if len(args[0]) == 8 {
-			fmt.Println("La couleur n'est pas communique\n\nEX: go run . --color=<color> <letters to be colored> 'something'")
-
-		} else if args[0][:8] != "--color=" { //flag malformaté
-			fmt.Println("Usage: go run . [OPTION] [STRING] [BANNER]\n\nEX: go run . --color=<color> <letters to be colored> 'something'")
-
+	if len(args) == 0 || len(args) > 4 {
+		fmt.Println("Usage: go run . [OPTION] [STRING]\n\nEX: go run . --color=<color> <letters to be colored> 'something'")
+	} else if len(args) == 1 {
+		//si l'utilisateur écrit --color ou --color= ou color=something
+		if len(args[0]) >= 7 && (args[0] == "--color") || (len(args[0]) > 7 && args[0][:8] == "--color=") {
+			fmt.Println("Usage: go run . [OPTION] [STRING]\n\nEX: go run . --color=<color> <letters to be colored> 'something'")
 		} else {
-			fmt.Print(Naboucolor("rouge", args[1], args[2]))
+			funca.Ascii()
+
 		}
-	}
+	} else if len(args) == 2 {
+		if args[0] == "--color" || args[0] == "--color=" {
+			fmt.Println("Usage: go run . [OPTION] [STRING]\n\nEX: go run . --color=<color> <letters to be colored> 'something'")
 
-	//------------------------------------------------  III  --------------------------------------------------------------//
-	if len(args) == 2 { // cas avec 2 arguments
-
-		if len(args[0]) < 8 { //flag malformaté
-			fmt.Println("Usage: go run . [OPTION] [STRING] [BANNER]\n\nEX: go run . --color=<color> <letters to be colored> 'something'")
-
-		} else if len(args[0]) == 8 {
-			fmt.Println("La couleur n'est pas communique\n\nEX: go run . --color=<color> <letters to be colored> 'something'")
-
-		} else if args[0][:8] != "--color=" { //flag malformaté
-			fmt.Println("Usage: go run . [OPTION] [STRING] [BANNER]\n\nEX: go run . --color=<color> <letters to be colored> 'something'")
+		} else if len(args[0]) > 8 && args[0][:8] == "--color=" {
+			colorType := strings.TrimPrefix(args[0], "--color=")
+			ColoredAscii(colorType, args[1], args[1], "standard")
 		} else {
-			fmt.Print(Naboucolor("standard", args[1], args[1]))
+			fmt.Println("Usage: go run . [OPTION] [STRING]\n\nEX: go run . --color=<color> <letters to be colored> 'something'")
 		}
+	} else if len(args) == 3 || len(args) == 4 {
+		if args[0] == "--color" || args[0] == "--color=" {
+			fmt.Println("Usage: go run . [OPTION] [STRING]\n\nEX: go run . --color=<color> <letters to be colored> 'something'")
 
-	}
-
-	//------------------------------------------------  IV  ---------------------------------------------------------------//
-	if len(args) == 1 {
-		if len(args[0]) >= 7 && args[0][:7] == "--color" {
-			if len(args[0]) > 7 && args[0][7] == '=' { //argument malformaté
-				fmt.Println("Usage: go run . [OPTION] [STRING] [BANNER]\n\nEX: go run . --color=<color> <letters to be colored> 'something'")
-			} else if len(args[0]) == 7 && args[0][:7] == "--color" {
-				fmt.Println("Usage: go run . [OPTION] [STRING] [BANNER]\n\nEX: go run . --color=<color> <letters to be colored> 'something'")
+		} else if len(args[0]) > 8 && args[0][:8] == "--color=" {
+			colorType := strings.TrimPrefix(args[0], "--color=")
+			if len(args) == 3 {
+				ColoredAscii(colorType, args[1], args[2], "standard")
 			} else {
-				Func.Naboufs("standard", args[0])
+				ColoredAscii(colorType, args[1], args[2], args[3])
+			}
+		} else {
+			fmt.Println("Usage: go run . [OPTION] [STRING]\n\nEX: go run . --color=<color> <letters to be colored> 'something'")
+		}
+	}
+
+}
+func ColoredAscii(colorType, letters, phrase, banner string) {
+	if Match(regexHEXA, colorType) || Match(regexHSL, colorType) || Match(regexRGB, colorType) || ColorsName(colorType) {
+		//set of letters ,optional argument
+
+		//-------------------------------------1er étape: Lire le fichier avec les graphiques------------------------------------------------//
+		//                                     -----------------------------------------------                                              //
+		file, err := os.Open("ascii-art-color/" + banner + ".txt")
+		if err != nil {
+			fmt.Println("Erreur: nous ne parvenons pas a lire le fichier source standard : ", err)
+		} else {
+			// Stocker les caractères des graphiques dans une variable
+			longtext := bufio.NewScanner(file)
+
+			// Mettre les données stockées dans un tableau de string
+			var tab []string
+			for longtext.Scan() {
+				tab = append(tab, longtext.Text())
+			}
+
+			//--------------------------2ème étape: stocker chaque ensemble de caractère pour chaque ascii dans un slice de string---------------//
+			//                           ------------------------------------------------------------------------------------------              //
+			var vinc [][]string
+			for i := 1; i < len(tab); i += 9 {
+				vinc = append(vinc, tab[i:i+8])
+			}
+			//-----------------------------------------------------3ème étape: gérer l'affichage------------------------------------------------------//
+			//                                                     ------------------------------                                                    //
+
+			//--vérifier si l'argument contient un caractère affichable
+			test := phrase
+			if !IsPrintable(test) { // l'argument ne contient pas de caractère affichable
+				// return
+
+			} else { // l'argument contient un caractère affichable
+
+				splitext := strings.Split(test, "\\n") // séparer le string en cas de présence d'un "newline"s
+				splitext = Newline(splitext)
+				var num int //varibale pour déterminer l'index dans le tableau des caractères
+				// --Afficher le string de l'argument sous le format ascii-art
+				for _, v := range splitext {
+
+					//--récolter les caractères asci-art à afficher
+					var result [][]string
+					for _, y := range v {
+
+						num = int(y - 32) //la position correspondant au caractère selon le tableau de caractères dans vinc
+						if num > 95 {
+							continue
+						} else {
+
+							if strings.ContainsRune(letters, y) {
+								//couleur choisi
+								// fmt.Println("yup", letters, y)
+								result = append(result, CodeColor(colorType, vinc[num]))
+							} else {
+
+								result = append(result, vinc[num])
+							}
+						}
+
+					}
+					fmt.Println(printres(result)) // affiche la version graphique des caractères récoltées
+				}
 			}
 		}
-	} else if len(args) == 0 { // pas d'argument
-		fmt.Println("Usage: go run . [OPTION] [STRING] [BANNER]\n\nEX: go run . --color=<color> <letters to be colored> 'something'")
+	} else {
+		fmt.Println("unknow color")
 	}
-
 }
 
 // ----------------------------------------------------------Fonctions utilisées-------------------------------------------------------//
@@ -131,84 +183,4 @@ func Newline(tab []string) []string {
 		res = tab
 	}
 	return res
-}
-
-// ///
-func Naboucolor(color, acolor, phrase string) string {
-
-	var final string
-	//-------------------------------------1er étape: Lire le fichier avec les graphiques------------------------------------------------//
-	//                                     -----------------------------------------------                                              //
-	file, err := os.Open("ascii-art-color/standard.txt")
-	if err != nil {
-		fmt.Println("Erreur: nous ne parvenons pas a lire le fichier source standard : ", err)
-	} else {
-		// Stocker les caractères des graphiques dans une variable
-		longtext := bufio.NewScanner(file)
-
-		// Mettre les données stockées dans un tableau de string
-		var tab []string
-		for longtext.Scan() {
-			tab = append(tab, longtext.Text())
-		}
-
-		//--------------------------2ème étape: stocker chaque ensemble de caractère pour chaque ascii dans un slice de string---------------//
-		//                           ------------------------------------------------------------------------------------------              //
-		var vinc [][]string
-		for i := 1; i < len(tab); i += 9 {
-			vinc = append(vinc, tab[i:i+8])
-		}
-		//-----------------------------------------------------3ème étape: gérer l'affichage------------------------------------------------------//
-		//                                                     ------------------------------                                                    //
-
-		//--vérifier si l'argument contient un caractère affichable
-		test := phrase
-		if !IsPrintable(test) { // l'argument ne contient pas de caractère affichable
-			// return
-
-		} else { // l'argument contient un caractère affichable
-
-			splitext := strings.Split(test, "\\n") // séparer le string en cas de présence d'un "newline"s
-			splitext = Newline(splitext)
-			var num int //varibale pour déterminer l'index dans le tableau des caractères
-			// --Afficher le string de l'argument sous le format ascii-art
-			for _, v := range splitext {
-
-				//--récolter les caractères asci-art à afficher
-				var result [][]string
-				for _, y := range v {
-					num = int(y - 32) //la position correspondant au caractère selon le tableau de caractères dans vinc
-					if num > 95 {
-						continue
-					} else {
-						// vérifier si la lettre récupérée est à colorier
-						if strings.ContainsRune(acolor, y) {
-							result = append(result, colorier(color, vinc[num]))
-						} else {
-							// sinon intégrer sans couleur
-							result = append(result, vinc[num])
-						}
-					}
-
-				}
-				final += (printres(result)) + "\n" // stocke les caractères graphiques
-			}
-		}
-	}
-	return final
-}
-
-//************************************************************************************************************************************//
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//************************************************************************************************************************************//
-
-// Colorier permet de parcourir la represetation ascii de la lettre récuperée
-// pour procéder au coloriage
-// (ceci n'est qu'un essai pour vérifier si les instructions marches. Elle est à corriger par la capitaine)
-func colorier(color string, s []string) []string {
-	for i := 0; i < len(s); i++ {
-		s[i] = "\033[38;5;208m" + s[i] + "\033[0m"
-	}
-
-	return s
 }
