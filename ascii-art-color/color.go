@@ -9,37 +9,36 @@ import (
 )
 
 // couleurs par défaut
-type Colors struct {
+
+var tabcolors = []struct {
 	name, ANSI_Code string
+}{
+	{"black", "\033[30m"}, {"red", "\033[31m"},
+	{"green", "\033[32m"},
+	{"yellow", "\033[33m"},
+	{"blue", "\033[34m"},
+	{"violet", "\033[35m"},
+	{"cyan", "\033[36m"},
+	{"white", "\033[<37m"},
+	{"orange", "\033[38;2;255;165;0m"},
+	{"pink", "\033[38;5;206m"},
+	{"brown", "\033[38;5;130m"},
+	{"purple", "\033[38;5;141m"},
+	{"magenta", "\033[38;5;205m"},
+	{"grey", "\033[90m"},
+	{"bright red", "\033[91m"},
+	{"bright green", "\033[92m"},
+	{"bright yellow", "\033[93m"},
+	{"bright_blue", "\033[94m"},
+	{"bright magenta", "\033[95m"},
+	{"bright cyan", "\033[96m"},
+	{"bright white", "\033[97m"},
 }
 
-var black = Colors{"black", "\033[30m"}
-var red = Colors{"red", "\033[31m"}
-var green = Colors{"green", "\033[32m"}
-var yellow = Colors{"yellow", "\033[33m"}
-var blue = Colors{"blue", "\033[34m"}
-var violet = Colors{"violet", "\033[35m"}
-var cyan = Colors{"cyan", "\033[36m"}
-var white = Colors{"white", "\033[<37m"}
-var orange = Colors{"orange", "\033[38;2;255;165;0m"}
-var pink = Colors{"pink", "\033[38;5;206m"}
-var brown = Colors{"brown", "\033[38;5;130m"}
-var purple = Colors{"purple", "\033[38;5;141m"}
-var magenta = Colors{"magenta", "\033[38;5;205m"}
-var grey = Colors{"grey", "\033[90m"}
-var bright_red = Colors{"bright red", "\033[91m"}
-var bright_green = Colors{"bright green", "\033[92m"}
-var bright_yellow = Colors{"bright yellow", "\033[93m"}
-var bright_blue = Colors{"bright_blue", "\033[94m"}
-var bright_magenta = Colors{"bright magenta", "\033[95m"}
-var bright_cyan = Colors{"bright cyan", "\033[96m"}
-var bright_white = Colors{"bright white", "\033[97m"}
-var tabcolors = []Colors{black, red, green, yellow, blue, violet, white,
-	cyan, grey, orange, pink, brown, purple, magenta, bright_red,
-	bright_green, bright_yellow, bright_blue, bright_magenta, bright_cyan, bright_white}
+//Regex pour les codes couleurs HSL,RGB et Hexa
 var regexHSL = regexp.MustCompile(`^hsl+\([0-9]+\, +[0-9]+\%, +[0-9]+\%+\)$`)
 var regexRGB = regexp.MustCompile(`^rgb+\([0-9]+\, +[0-9]+\, +[0-9]+\)$`)
-var regexHEXA = regexp.MustCompile(`[0-9a-fA-F]{6}`)
+var regexHEXA = regexp.MustCompile(`^#[0-9a-fA-F]{6}$`)
 
 // permet de savoir si le string donnée est une couleur existante
 func ColorsName(name string) bool {
@@ -51,18 +50,25 @@ func ColorsName(name string) bool {
 	return false
 }
 
+//Vérifie que le regex donnée est respecté par l'argument 1
 func Match(regex *regexp.Regexp, s string) bool {
 	return regex.MatchString(s)
 }
 
 // convertir hsl en rgb
 func HSLToRGB(h, S, L float64) (r, g, b int) {
+	//Hue,saturation and lightness
 	s, l := S/100, L/100
+	//calcul la saturation de la couleur
 	c := (1 - math.Abs(2*l-1)) * s
+	// la position des angles
 	hp := h / 60.0
+	//calcul final de la quantité de rouge,de vert,de bleu
 	x := c * (1 - math.Abs(math.Mod(hp, 2)-1))
+	//luminosité minimale
 	m := l - c/2.0
 
+	//determination des couleurs en fonctions de leur position sur le cercle
 	switch {
 	case 0 <= hp && hp < 1:
 		r, g, b = int((c+m)*255), int((x+m)*255), int(m*255)
@@ -91,6 +97,7 @@ func RecupNumbers(code string, regex *regexp.Regexp) (fValue, sValue, tValue int
 		code = strings.ReplaceAll(code, "%", "")
 		fmt.Sscanf(code, "hsl(%d, %d, %d)", &fValue, &sValue, &tValue)
 	case regexHEXA:
+		code = strings.ReplaceAll(code, "#", "")
 		fmt.Sscanf(code, "%02x%02x%02x", &f, &s, &t)
 	}
 	return fValue, sValue, tValue, f, s, t
@@ -134,7 +141,10 @@ func CodeColor(colorType string, asciiTab []string) []string {
 	}
 
 	for i := 0; i < len(asciiTab); i++ {
-		asciiTab[i] = code + asciiTab[i] + reset
+		if code != "" {
+
+			asciiTab[i] = code + asciiTab[i] + reset
+		}
 	}
 
 	return asciiTab

@@ -1,7 +1,7 @@
 package Func
 
 import (
-	funca "Func/ascii-art"
+	Funca "Func/ascii-art"
 	"bufio"
 	"fmt"
 	"os"
@@ -18,7 +18,7 @@ func Color() {
 		if len(args[0]) >= 7 && (args[0] == "--color") || (len(args[0]) > 7 && args[0][:8] == "--color=") {
 			fmt.Println("Usage: go run . [OPTION] [STRING]\n\nEX: go run . --color=<color> <letters to be colored> 'something'")
 		} else {
-			funca.Ascii()
+			Funca.Ascii()
 
 		}
 	} else if len(args) == 2 {
@@ -55,6 +55,7 @@ func ColoredAscii(colorType, letters, phrase, banner string) {
 		//-------------------------------------1er étape: Lire le fichier avec les graphiques------------------------------------------------//
 		//                                     -----------------------------------------------                                              //
 		file, err := os.Open("ascii-art-color/" + banner + ".txt")
+		// file, err := os.Open("../" + banner + ".txt")
 		if err != nil {
 			fmt.Println("Erreur: nous ne parvenons pas a lire le fichier source standard : ", err)
 		} else {
@@ -97,13 +98,12 @@ func ColoredAscii(colorType, letters, phrase, banner string) {
 						if num > 95 {
 							continue
 						} else {
-
+							//vérifier si la lettre est contenue dans le set of letters
 							if strings.ContainsRune(letters, y) {
-								//couleur choisi
-								// fmt.Println("yup", letters, y)
+								//si oui transformer le tableau ascii correspondant en tableau coloré
 								result = append(result, CodeColor(colorType, vinc[num]))
 							} else {
-
+								//sinon ajouter simplement le tableau ascii correspondant
 								result = append(result, vinc[num])
 							}
 						}
@@ -114,14 +114,13 @@ func ColoredAscii(colorType, letters, phrase, banner string) {
 			}
 		}
 	} else {
-		fmt.Printf("'%v' n'est pas pris en compte\n", colorType)
+		fmt.Println("unknow color")
 	}
 }
 
 // ----------------------------------------------------------Fonctions utilisées-------------------------------------------------------//
 // printres gére l'affichage d'un tableau à 2 dimensions contenant des caractères
 func printres(result [][]string) string {
-
 	var temp string          // stocker les cartères à afficher par ligne
 	for i := 0; i < 8; i++ { // parcourir la colonne
 		for j := 0; j < len(result); j++ { // parcourir la ligne
@@ -135,6 +134,7 @@ func printres(result [][]string) string {
 				temp += "\n"
 			}
 		}
+
 	}
 	return temp //retourne la ligne
 }
