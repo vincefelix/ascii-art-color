@@ -1,0 +1,444 @@
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<title>ascii-art-color: Go Coverage Report</title>
+		<style>
+			body {
+				background: black;
+				color: rgb(80, 80, 80);
+			}
+			body, pre, #legend span {
+				font-family: Menlo, monospace;
+				font-weight: bold;
+			}
+			#topbar {
+				background: black;
+				position: fixed;
+				top: 0; left: 0; right: 0;
+				height: 42px;
+				border-bottom: 1px solid rgb(80, 80, 80);
+			}
+			#content {
+				margin-top: 50px;
+			}
+			#nav, #legend {
+				float: left;
+				margin-left: 10px;
+			}
+			#legend {
+				margin-top: 12px;
+			}
+			#nav {
+				margin-top: 10px;
+			}
+			#legend span {
+				margin: 0 5px;
+			}
+			.cov0 { color: rgb(192, 0, 0) }
+.cov1 { color: rgb(128, 128, 128) }
+.cov2 { color: rgb(116, 140, 131) }
+.cov3 { color: rgb(104, 152, 134) }
+.cov4 { color: rgb(92, 164, 137) }
+.cov5 { color: rgb(80, 176, 140) }
+.cov6 { color: rgb(68, 188, 143) }
+.cov7 { color: rgb(56, 200, 146) }
+.cov8 { color: rgb(44, 212, 149) }
+.cov9 { color: rgb(32, 224, 152) }
+.cov10 { color: rgb(20, 236, 155) }
+
+		</style>
+	</head>
+	<body>
+		<div id="topbar">
+			<div id="nav">
+				<select id="files">
+				
+				<option value="file0">Func/ascii-art-color/color.go (100.0%)</option>
+				
+				<option value="file1">Func/ascii-art-color/func.go (25.9%)</option>
+				
+				</select>
+			</div>
+			<div id="legend">
+				<span>not tracked</span>
+			
+				<span class="cov0">not covered</span>
+				<span class="cov8">covered</span>
+			
+			</div>
+		</div>
+		<div id="content">
+		
+		<pre class="file" id="file0" style="display: none">package Func
+
+import (
+        "fmt"
+        "math"
+        "regexp"
+        "strconv"
+        "strings"
+)
+
+// couleurs par défaut
+
+var tabcolors = []struct {
+        name, ANSI_Code string
+}{
+        {"black", "\033[30m"}, {"red", "\033[31m"},
+        {"green", "\033[32m"},
+        {"yellow", "\033[33m"},
+        {"blue", "\033[34m"},
+        {"violet", "\033[35m"},
+        {"cyan", "\033[36m"},
+        {"white", "\033[&lt;37m"},
+        {"orange", "\033[38;2;255;165;0m"},
+        {"pink", "\033[38;5;206m"},
+        {"brown", "\033[38;5;130m"},
+        {"purple", "\033[38;5;141m"},
+        {"magenta", "\033[38;5;205m"},
+        {"grey", "\033[90m"},
+        {"bright red", "\033[91m"},
+        {"bright green", "\033[92m"},
+        {"bright yellow", "\033[93m"},
+        {"bright_blue", "\033[94m"},
+        {"bright magenta", "\033[95m"},
+        {"bright cyan", "\033[96m"},
+        {"bright white", "\033[97m"},
+}
+
+//Regex pour les codes couleurs HSL,RGB et Hexa
+var regexHSL = regexp.MustCompile(`^hsl+\([0-9]+\, +[0-9]+\%, +[0-9]+\%+\)$`)
+var regexRGB = regexp.MustCompile(`^rgb+\([0-9]+\, +[0-9]+\, +[0-9]+\)$`)
+var regexHEXA = regexp.MustCompile(`^#[0-9a-fA-F]{6}$`)
+
+// permet de savoir si le string donnée est une couleur existante
+func ColorsName(name string) bool <span class="cov8" title="1">{
+        for i := 0; i &lt; len(tabcolors); i++ </span><span class="cov8" title="1">{
+                if name == tabcolors[i].name </span><span class="cov8" title="1">{
+                        return true
+                }</span>
+        }
+        <span class="cov8" title="1">return false</span>
+}
+
+//Vérifie que le regex donnée est respecté par l'argument 1
+func Match(regex *regexp.Regexp, s string) bool <span class="cov8" title="1">{
+        return regex.MatchString(s)
+}</span>
+
+// convertir hsl en rgb
+func HSLToRGB(h, S, L float64) (r, g, b int) <span class="cov8" title="1">{
+        //Hue,saturation and lightness
+        s, l := S/100, L/100
+        //calcul la saturation de la couleur
+        c := (1 - math.Abs(2*l-1)) * s
+        // la position des angles
+        hp := h / 60.0
+        //calcul final de la quantité de rouge,de vert,de bleu
+        x := c * (1 - math.Abs(math.Mod(hp, 2)-1))
+        //luminosité minimale
+        m := l - c/2.0
+
+        //determination des couleurs en fonctions de leur position sur le cercle
+        switch </span>{
+        case 0 &lt;= hp &amp;&amp; hp &lt; 1:<span class="cov8" title="1">
+                r, g, b = int((c+m)*255), int((x+m)*255), int(m*255)</span>
+        case 1 &lt;= hp &amp;&amp; hp &lt; 2:<span class="cov8" title="1">
+                r, g, b = int((x+m)*255), int((c+m)*255), int(m*255)</span>
+        case 2 &lt;= hp &amp;&amp; hp &lt; 3:<span class="cov8" title="1">
+                r, g, b = int(m*255), int((c+m)*255), int((x+m)*255)</span>
+        case 3 &lt;= hp &amp;&amp; hp &lt; 4:<span class="cov8" title="1">
+                r, g, b = int(m*255), int((x+m)*255), int((c+m)*255)</span>
+        case 4 &lt;= hp &amp;&amp; hp &lt; 5:<span class="cov8" title="1">
+                r, g, b = int((x+m)*255), int(m*255), int((c+m)*255)</span>
+        default:<span class="cov8" title="1">
+                r, g, b = int((c+m)*255), int(m*255), int((x+m)*255)</span>
+        }
+        <span class="cov8" title="1">return</span>
+}
+
+// récuper les valeurs numériques ou hexa du string
+// // --color=hsl(0, 100%, 50%)
+// // --color=rgb(255, 0, 0)
+func RecupNumbers(code string, regex *regexp.Regexp) (fValue, sValue, tValue int, f, s, t uint8) <span class="cov8" title="1">{
+        switch regex </span>{
+        case regexRGB:<span class="cov8" title="1">
+                fmt.Sscanf(code, "rgb(%d, %d, %d)", &amp;fValue, &amp;sValue, &amp;tValue)</span>
+        case regexHSL:<span class="cov8" title="1">
+                code = strings.ReplaceAll(code, "%", "")
+                fmt.Sscanf(code, "hsl(%d, %d, %d)", &amp;fValue, &amp;sValue, &amp;tValue)</span>
+        case regexHEXA:<span class="cov8" title="1">
+                code = strings.ReplaceAll(code, "#", "")
+                fmt.Sscanf(code, "%02x%02x%02x", &amp;f, &amp;s, &amp;t)</span>
+        }
+        <span class="cov8" title="1">return fValue, sValue, tValue, f, s, t</span>
+}
+
+// trouver le code ANSI
+func FindAnsiCode(ColorName string) string <span class="cov8" title="1">{
+        var color string
+        for i := 0; i &lt; len(tabcolors); i++ </span><span class="cov8" title="1">{
+
+                if ColorName == tabcolors[i].name || ColorName == tabcolors[i].ANSI_Code </span><span class="cov8" title="1">{
+                        color = tabcolors[i].ANSI_Code
+                }</span>
+        }
+        <span class="cov8" title="1">return color</span>
+}
+
+// Fonnction qui reconnait le code couleur
+func CodeColor(colorType string, asciiTab []string) []string <span class="cov8" title="1">{
+        reset := "\033[0m"
+        code := ""
+        // fmt.Println(regexHSL.MatchString(colorType))
+        if Match(regexHSL, colorType) </span><span class="cov8" title="1">{
+                h, s, l, _, _, _ := RecupNumbers(colorType, regexHSL)
+                r, g, b := HSLToRGB(float64(h), float64(s), float64(l))
+                // r, g, b := HSLToRGB(222.0, 0.5, 0.5)
+
+                code = "\033[38;2;" + strconv.Itoa(r) + ";" + strconv.Itoa(g) + ";" + strconv.Itoa(b) + "m"
+
+        }</span> else<span class="cov8" title="1"> if Match(regexRGB, colorType) </span><span class="cov8" title="1">{
+                r, g, b, _, _, _ := RecupNumbers(colorType, regexRGB)
+                code = "\033[38;2;" + strconv.Itoa(r) + ";" + strconv.Itoa(g) + ";" + strconv.Itoa(b) + "m"
+
+        }</span> else<span class="cov8" title="1"> if Match(regexHEXA, colorType) </span><span class="cov8" title="1">{
+                _, _, _, r, g, b := RecupNumbers(colorType, regexHEXA)
+                code = "\033[38;2;" + strconv.Itoa(int(r)) + ";" + strconv.Itoa(int(g)) + ";" + strconv.Itoa(int(b)) + "m"
+
+        }</span> else<span class="cov8" title="1"> if ColorsName(colorType) </span><span class="cov8" title="1">{
+
+                code = FindAnsiCode(colorType)
+        }</span>
+
+        <span class="cov8" title="1">for i := 0; i &lt; len(asciiTab); i++ </span><span class="cov8" title="1">{
+                if code != "" </span><span class="cov8" title="1">{
+
+                        asciiTab[i] = code + asciiTab[i] + reset
+                }</span>
+        }
+
+        <span class="cov8" title="1">return asciiTab</span>
+}
+</pre>
+		
+		<pre class="file" id="file1" style="display: none">package Func
+
+import (
+        Funca "Func/ascii-art"
+        "bufio"
+        "fmt"
+        "os"
+        "strings"
+)
+
+func Color() <span class="cov8" title="1">{
+        args := os.Args[1:]
+
+        if len(args) == 0 || len(args) &gt; 4 </span><span class="cov8" title="1">{
+                fmt.Println("Usage: go run . [OPTION] [STRING]\n\nEX: go run . --color=&lt;color&gt; &lt;letters to be colored&gt; 'something'")
+        }</span> else<span class="cov8" title="1"> if len(args) == 1 </span><span class="cov8" title="1">{
+                //si l'utilisateur écrit --color ou --color= ou color=something
+                if len(args[0]) &gt;= 7 &amp;&amp; (args[0] == "--color") || (len(args[0]) &gt; 7 &amp;&amp; args[0][:8] == "--color=") </span><span class="cov8" title="1">{
+                        fmt.Println("Usage: go run . [OPTION] [STRING]\n\nEX: go run . --color=&lt;color&gt; &lt;letters to be colored&gt; 'something'")
+                }</span> else<span class="cov0" title="0"> {
+                        Funca.Ascii()
+
+                }</span>
+        } else<span class="cov8" title="1"> if len(args) == 2 </span><span class="cov8" title="1">{
+                if args[0] == "--color" || args[0] == "--color=" </span><span class="cov8" title="1">{
+                        fmt.Println("Usage: go run . [OPTION] [STRING]\n\nEX: go run . --color=&lt;color&gt; &lt;letters to be colored&gt; 'something'")
+
+                }</span> else<span class="cov8" title="1"> if len(args[0]) &gt; 8 &amp;&amp; args[0][:8] == "--color=" </span><span class="cov0" title="0">{
+                        colorType := strings.TrimPrefix(args[0], "--color=")
+                        ColoredAscii(colorType, args[1], args[1], "standard")
+                }</span> else<span class="cov8" title="1"> {
+                        fmt.Println("Usage: go run . [OPTION] [STRING]\n\nEX: go run . --color=&lt;color&gt; &lt;letters to be colored&gt; 'something'")
+                }</span>
+        } else<span class="cov8" title="1"> if len(args) == 3 || len(args) == 4 </span><span class="cov8" title="1">{
+                if args[0] == "--color" || args[0] == "--color=" </span><span class="cov8" title="1">{
+                        fmt.Println("Usage: go run . [OPTION] [STRING]\n\nEX: go run . --color=&lt;color&gt; &lt;letters to be colored&gt; 'something'")
+
+                }</span> else<span class="cov8" title="1"> if len(args[0]) &gt; 8 &amp;&amp; args[0][:8] == "--color=" </span><span class="cov8" title="1">{
+                        colorType := strings.TrimPrefix(args[0], "--color=")
+                        if len(args) == 3 </span><span class="cov8" title="1">{
+                                ColoredAscii(colorType, args[1], args[2], "standard")
+                        }</span> else<span class="cov0" title="0"> {
+                                ColoredAscii(colorType, args[1], args[2], args[3])
+                        }</span>
+                } else<span class="cov8" title="1"> {
+                        fmt.Println("Usage: go run . [OPTION] [STRING]\n\nEX: go run . --color=&lt;color&gt; &lt;letters to be colored&gt; 'something'")
+                }</span>
+        }
+
+}
+func ColoredAscii(colorType, letters, phrase, banner string) <span class="cov8" title="1">{
+        if Match(regexHEXA, colorType) || Match(regexHSL, colorType) || Match(regexRGB, colorType) || ColorsName(colorType) </span><span class="cov0" title="0">{
+                //set of letters ,optional argument
+
+                //-------------------------------------1er étape: Lire le fichier avec les graphiques------------------------------------------------//
+                //                                     -----------------------------------------------                                              //
+                file, err := os.Open("ascii-art-color/" + banner + ".txt")
+                // file, err := os.Open("../" + banner + ".txt")
+                if err != nil </span><span class="cov0" title="0">{
+                        fmt.Println("Erreur: nous ne parvenons pas a lire le fichier source standard : ", err)
+                }</span> else<span class="cov0" title="0"> {
+                        // Stocker les caractères des graphiques dans une variable
+                        longtext := bufio.NewScanner(file)
+
+                        // Mettre les données stockées dans un tableau de string
+                        var tab []string
+                        for longtext.Scan() </span><span class="cov0" title="0">{
+                                tab = append(tab, longtext.Text())
+                        }</span>
+
+                        //--------------------------2ème étape: stocker chaque ensemble de caractère pour chaque ascii dans un slice de string---------------//
+                        //                           ------------------------------------------------------------------------------------------              //
+                        <span class="cov0" title="0">var vinc [][]string
+                        for i := 1; i &lt; len(tab); i += 9 </span><span class="cov0" title="0">{
+                                vinc = append(vinc, tab[i:i+8])
+                        }</span>
+                        //-----------------------------------------------------3ème étape: gérer l'affichage------------------------------------------------------//
+                        //                                                     ------------------------------                                                    //
+
+                        //--vérifier si l'argument contient un caractère affichable
+                        <span class="cov0" title="0">test := phrase
+                        if !IsPrintable(test) </span>{<span class="cov0" title="0"> // l'argument ne contient pas de caractère affichable
+                                // return
+
+                        }</span> else<span class="cov0" title="0"> { // l'argument contient un caractère affichable
+
+                                splitext := strings.Split(test, "\\n") // séparer le string en cas de présence d'un "newline"s
+                                splitext = Newline(splitext)
+                                var num int //varibale pour déterminer l'index dans le tableau des caractères
+                                // --Afficher le string de l'argument sous le format ascii-art
+                                for _, v := range splitext </span><span class="cov0" title="0">{
+
+                                        //--récolter les caractères asci-art à afficher
+                                        var result [][]string
+                                        for _, y := range v </span><span class="cov0" title="0">{
+
+                                                num = int(y - 32) //la position correspondant au caractère selon le tableau de caractères dans vinc
+                                                if num &gt; 95 </span><span class="cov0" title="0">{
+                                                        continue</span>
+                                                } else<span class="cov0" title="0"> {
+                                                        //vérifier si la lettre est contenue dans le set of letters
+                                                        if strings.ContainsRune(letters, y) </span><span class="cov0" title="0">{
+                                                                //si oui transformer le tableau ascii correspondant en tableau coloré
+                                                                result = append(result, CodeColor(colorType, vinc[num]))
+                                                        }</span> else<span class="cov0" title="0"> {
+                                                                //sinon ajouter simplement le tableau ascii correspondant
+                                                                result = append(result, vinc[num])
+                                                        }</span>
+                                                }
+
+                                        }
+                                        <span class="cov0" title="0">fmt.Println(printres(result))</span> // affiche la version graphique des caractères récoltées
+                                }
+                        }
+                }
+        } else<span class="cov8" title="1"> {
+                fmt.Println("unknow color")
+        }</span>
+}
+
+// ----------------------------------------------------------Fonctions utilisées-------------------------------------------------------//
+// printres gére l'affichage d'un tableau à 2 dimensions contenant des caractères
+func printres(result [][]string) string <span class="cov0" title="0">{
+        var temp string          // stocker les cartères à afficher par ligne
+        for i := 0; i &lt; 8; i++ </span><span class="cov0" title="0">{ // parcourir la colonne
+                for j := 0; j &lt; len(result); j++ </span><span class="cov0" title="0">{ // parcourir la ligne
+                        temp += result[j][i]
+                }</span>
+                <span class="cov0" title="0">if i != 7 </span><span class="cov0" title="0">{ // ne pas ajouter de newline au dernier caractère
+
+                        if temp == "" </span><span class="cov0" title="0">{
+                                break</span>
+                        } else<span class="cov0" title="0"> {
+                                temp += "\n"
+                        }</span>
+                }
+
+        }
+        <span class="cov0" title="0">return temp</span> //retourne la ligne
+}
+
+/*
+IsPrintable permet de vérifier si le string comporte un caractère affichable ou pas
+-il renvoie true s'il rencontre un seul caractère affichable
+-et renvoie false s'il n'en voit aucun.
+*/
+func IsPrintable(s string) bool <span class="cov0" title="0">{
+        a := []rune(s) //convertir le tableau string en tableau de runes
+        b := len(s)
+        rep := true
+        for i := 0; i &lt;= b-1; i++ </span><span class="cov0" title="0">{
+                if a[i] &lt; 0 || a[i] &gt; 127 </span><span class="cov0" title="0">{
+                        fmt.Println("Non affichable, aucune correspondance graphique !")
+                        rep = false
+                        break</span>
+
+                } else<span class="cov0" title="0"> if a[i] &lt; 32 || a[i] &gt; 126 </span><span class="cov0" title="0">{ //intervalle des caractères affichable
+                        rep = false
+                }</span> else<span class="cov0" title="0"> {
+                        rep = true
+                        break</span>
+                }
+        }
+        <span class="cov0" title="0">return rep</span>
+}
+
+// newline enlève le dernier élément d'un taleau exclusivement constitué de newline
+func Newline(tab []string) []string <span class="cov0" title="0">{
+        var count int // compteur
+        for _, v := range tab </span><span class="cov0" title="0">{
+                if v == "" </span><span class="cov0" title="0">{
+                        count++
+                }</span>
+        }
+        <span class="cov0" title="0">var res []string
+
+        // il n'y a que des newlines
+        if count == len(tab) </span><span class="cov0" title="0">{
+                res = tab[:len(tab)-1]
+        }</span> else<span class="cov0" title="0"> {
+
+                //on renvoie le tableau d'origine
+                res = tab
+        }</span>
+        <span class="cov0" title="0">return res</span>
+}
+</pre>
+		
+		</div>
+	</body>
+	<script>
+	(function() {
+		var files = document.getElementById('files');
+		var visible;
+		files.addEventListener('change', onChange, false);
+		function select(part) {
+			if (visible)
+				visible.style.display = 'none';
+			visible = document.getElementById(part);
+			if (!visible)
+				return;
+			files.value = part;
+			visible.style.display = 'block';
+			location.hash = part;
+		}
+		function onChange() {
+			select(files.value);
+			window.scrollTo(0, 0);
+		}
+		if (location.hash != "") {
+			select(location.hash.substr(1));
+		}
+		if (!visible) {
+			select("file0");
+		}
+	})();
+	</script>
+</html>
