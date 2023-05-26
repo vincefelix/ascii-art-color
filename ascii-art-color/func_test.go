@@ -78,14 +78,15 @@ func ExampleColor_five() {
 	//EX: go run . --color=<color> <letters to be colored> 'something'
 }
 
-//tester la fonction qui transforme un tableau ascii en tableau coloré
+// tester la fonction qui transforme un tableau ascii en tableau coloré
 func ExampleColor_six() {
 
 	os.Args = tab[6]
 	Color()
+	// Output:
+	// La couleur n'est pas prise en compte
+	// EX: go run . --color=<color> <letters to be colored> 'something'
 
-	//Output:
-	//unknow color
 }
 
 func Test_CodeColor(t *testing.T) {

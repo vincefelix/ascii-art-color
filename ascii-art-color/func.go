@@ -114,7 +114,7 @@ func ColoredAscii(colorType, letters, phrase, banner string) {
 			}
 		}
 	} else {
-		fmt.Println("unknow color")
+		fmt.Println("La couleur n'est pas prise en compte\nEX: go run . --color=<color> <letters to be colored> 'something'")
 	}
 }
 
